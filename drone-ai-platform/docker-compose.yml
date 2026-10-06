@@ -1,0 +1,73 @@
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aeromind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env before using Compose}
+      POSTGRES_DB: ${POSTGRES_DB:-aeromind}
+    volumes:
+      - aeromind-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?Generate SECRET_KEY before using Compose}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aeromind}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB:-aeromind}
+      AUTO_CREATE_SCHEMA: ${AUTO_CREATE_SCHEMA:-true}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-true}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      TELEMETRY_MODE: ${TELEMETRY_MODE:-mock}
+      PX4_SYSTEM_ADDRESS: ${PX4_SYSTEM_ADDRESS:-udp://:14540}
+      MAVSDK_SERVER_ADDRESS: ${MAVSDK_SERVER_ADDRESS:-127.0.0.1}
+      MAVSDK_SERVER_PORT: ${MAVSDK_SERVER_PORT:-50051}
+      PX4_CONNECT_TIMEOUT_S: ${PX4_CONNECT_TIMEOUT_S:-15}
+      RECONNECT_BACKOFF_MAX_S: ${RECONNECT_BACKOFF_MAX_S:-30}
+      MOCK_TICK_SECONDS: ${MOCK_TICK_SECONDS:-1}
+      TELEMETRY_PERSIST_INTERVAL_S: ${TELEMETRY_PERSIST_INTERVAL_S:-2}
+      SAFE_MAX_ALTITUDE_M: ${SAFE_MAX_ALTITUDE_M:-120}
+      SAFE_MAX_SPEED_M_S: ${SAFE_MAX_SPEED_M_S:-25}
+      MAX_MISSION_WAYPOINTS: ${MAX_MISSION_WAYPOINTS:-100}
+    ports:
+      - "8000:8000"
+      - "14540:14540/udp"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  aeromind-postgres:

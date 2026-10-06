@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "BLE", "RUF"]
+ignore = ["B008", "BLE001", "RUF046"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
