@@ -1,0 +1,1 @@
+"""AeroMind API application."""
