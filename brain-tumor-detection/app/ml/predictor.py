@@ -327,11 +327,17 @@ class Predictor:
     def public_metadata(self) -> dict[str, Any]:
         metadata = dict(self._metadata or {})
         architecture = metadata.get("architecture") or {}
+        metrics = metadata.get("metrics") or {}
+        # Parameter count lives in the architecture block for checkpoints and in
+        # metrics for TorchScript + sidecar metadata — accept either.
+        parameters = architecture.get("parameters") if isinstance(architecture, dict) else None
+        if parameters is None:
+            parameters = metrics.get("parameters")
         return {
             "name": metadata.get("name", "BrainScan CNN"),
             "version": metadata.get("version", "1.0.0"),
             "architecture": architecture.get("architecture", "cnn") if isinstance(architecture, dict) else architecture,
-            "parameters": architecture.get("parameters") if isinstance(architecture, dict) else None,
+            "parameters": parameters,
             "framework": f"PyTorch {torch.__version__}",
             "device": self.device_name,
             "class_labels": list(self.class_labels),

@@ -254,6 +254,27 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray, probabilities: np.nd
 # --------------------------------------------------------------------------- #
 # Artefacts
 # --------------------------------------------------------------------------- #
+def normalize_metrics(metrics: dict) -> dict:
+    """Store validation metrics under consistent ``val_*`` keys.
+
+    Both the checkpoint bundle and ``metadata.json`` must expose the same names,
+    otherwise ``/api/model`` reports metrics for one artifact and ``—`` for the
+    other (the server prefers the TorchScript archive when it exists).
+    """
+    aliases = {
+        "accuracy": "val_accuracy",
+        "precision": "val_precision",
+        "recall": "val_recall",
+        "f1": "val_f1",
+        "roc_auc": "val_roc_auc",
+        "loss": "val_loss",
+    }
+    out: dict[str, Any] = {}
+    for key, value in (metrics or {}).items():
+        out[aliases.get(key, key)] = value
+    return out
+
+
 def save_checkpoint(
     path: Path,
     model: nn.Module,
@@ -299,7 +320,7 @@ def build_metadata(
         "img_size": config.img_size,
         "preprocess": spec.to_metadata(),
         "architecture": arch_config,
-        "metrics": metrics,
+        "metrics": normalize_metrics(metrics),
         "dataset": dataset_info,
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "trained_on": {
@@ -580,7 +601,7 @@ def train(config: TrainConfig) -> dict[str, Any]:
                 config=config,
                 spec=spec,
                 metrics={
-                    **{f"val_{k}" if k != "accuracy" else "val_accuracy": v for k, v in val_metrics.items()},
+                    **normalize_metrics(val_metrics),
                     "train_accuracy": train_metrics["accuracy"],
                     "train_loss": train_metrics["loss"],
                     "epoch": epoch,

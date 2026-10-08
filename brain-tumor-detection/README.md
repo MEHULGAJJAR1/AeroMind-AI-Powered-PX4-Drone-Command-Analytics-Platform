@@ -127,7 +127,7 @@ brain-tumor-detection/
 │   └── synthetic.py              # MRI phantom generator (pipeline testing)
 ├── static/                       # css/app.css, js/app.js, img/favicon.svg
 ├── templates/                    # index.html, 404.html
-├── tests/                        # 126 pytest tests (API, model, preprocessing, …)
+├── tests/                        # 127 pytest tests (API, model, preprocessing, …)
 ├── scripts/                      # setup.sh, run-dev.sh, train-demo-model.sh, smoke-test.sh
 ├── data/                         # runtime: models/, uploads/, history.db (git-ignored)
 ├── run.py                        # dev entry point
@@ -493,7 +493,7 @@ healthcheck and expects the checkpoint in the mounted `data/models`.
 
 ```bash
 pip install -r requirements.txt      # pytest is included
-python -m pytest                     # 126 tests
+python -m pytest                     # 127 tests
 python -m pytest tests/test_api.py -v
 ```
 

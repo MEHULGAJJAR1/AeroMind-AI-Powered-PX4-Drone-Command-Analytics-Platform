@@ -293,3 +293,40 @@ def test_torchscript_export_matches_best_checkpoint(tmp_path, flat_dataset):
 
     # The metadata metrics must describe the same weights as the checkpoint.
     assert bundle["metadata"]["metrics"]["epoch"] == bundle["metadata"]["epochs_completed"]
+
+
+def test_both_artifacts_expose_the_same_metrics_keys(tmp_path, flat_dataset):
+    """Regression: /api/model showed val accuracy for model.pt but None for the
+    TorchScript archive, because metadata.json used unprefixed metric keys."""
+    import json
+
+    from app.ml.predictor import Predictor
+
+    output = tmp_path / "models"
+    train(
+        TrainConfig(
+            data_dir=str(flat_dataset),
+            output_dir=str(output),
+            epochs=1,
+            batch_size=4,
+            img_size=32,
+            base_channels=8,
+            val_fraction=0.25,
+            patience=0,
+            export_torchscript=True,
+        )
+    )
+
+    sidecar = json.loads((output / "metadata.json").read_text(encoding="utf-8"))
+    assert "val_accuracy" in sidecar["metrics"]
+    assert "accuracy" not in sidecar["metrics"]
+
+    from_checkpoint = Predictor(output, prefer_scripted=False).load().public_metadata()
+    from_scripted = Predictor(output, prefer_scripted=True).load().public_metadata()
+
+    for payload in (from_checkpoint, from_scripted):
+        assert payload["metrics"]["val_accuracy"] is not None
+        assert payload["parameters"]
+
+    assert from_checkpoint["metrics"]["val_accuracy"] == from_scripted["metrics"]["val_accuracy"]
+    assert from_checkpoint["parameters"] == from_scripted["parameters"]
