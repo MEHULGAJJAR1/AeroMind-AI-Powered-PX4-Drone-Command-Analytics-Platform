@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Environment
+.env
+!.env.example
+
+# Runtime artefacts (uploads, checkpoints, database, reports).
+# `data/*` (not `data/`) so the .gitkeep placeholder can be re-included.
+data/*
+!data/.gitkeep
+*.db
+*.db-wal
+*.db-shm
+
+# Models are large binaries — keep them out of git
+*.pt
+*.pth
+*.onnx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

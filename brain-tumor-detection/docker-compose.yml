@@ -1,0 +1,26 @@
+services:
+  brainscan:
+    build: .
+    image: brainscan-ai:latest
+    container_name: brainscan-ai
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      BTD_ENV: production
+      BTD_SECRET_KEY: ${BTD_SECRET_KEY:-change-me-in-production}
+      BTD_MAX_UPLOAD_MB: ${BTD_MAX_UPLOAD_MB:-10}
+      BTD_RATE_LIMIT: ${BTD_RATE_LIMIT:-60}
+      BTD_LOG_LEVEL: ${BTD_LOG_LEVEL:-INFO}
+    volumes:
+      # Persists the model checkpoint, uploads and history database.
+      - brainscan-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  brainscan-data:

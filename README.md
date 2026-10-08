@@ -293,3 +293,12 @@ drone-ai-platform/
   scripts/                                     Linux/macOS + PowerShell setup/SITL helpers
   backend/Dockerfile  frontend/Dockerfile  docker-compose.yml
 ```
+
+---
+
+## Other projects in this repository
+
+| Directory | Description |
+| --- | --- |
+| [`drone-ai-platform/`](drone-ai-platform/) | AeroMind — PX4 drone command, telemetry and analytics platform (this document). |
+| [`brain-tumor-detection/`](brain-tumor-detection/) | BrainScan AI — end-to-end brain tumor detection web app: PyTorch CNN served by a Flask API with a responsive upload/predict UI, preprocessing pipeline, training CLI and prediction history. See its [README](brain-tumor-detection/README.md). |

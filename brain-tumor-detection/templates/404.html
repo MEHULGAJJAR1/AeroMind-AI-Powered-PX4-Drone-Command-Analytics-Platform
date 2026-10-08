@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Not found · BrainScan AI</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+</head>
+<body>
+  <main class="center-page">
+    <div class="card">
+      <div class="card__body">
+        <h1>404 — page not found</h1>
+        <p class="muted">The page you requested does not exist.</p>
+        <a class="button button--primary" href="{{ url_for('index') }}">Back to the scanner</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

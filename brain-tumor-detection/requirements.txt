@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# Brain Tumor Detection — BrainScan AI
+# Runtime + training dependencies (Python 3.10 - 3.13)
+#
+# Default PyPI install on Linux pulls the CUDA-enabled torch build.
+# For a smaller CPU-only install see README.md ("CPU-only PyTorch").
+# ---------------------------------------------------------------------------
+
+# --- Web backend -----------------------------------------------------------
+Flask>=3.0,<4.0
+Werkzeug>=3.0,<4.0
+
+# --- Deep learning ---------------------------------------------------------
+torch>=2.2,<3.0
+# torchvision is optional at inference time; required only when training with a
+# pretrained torchvision backbone (--architecture resnet18|efficientnet_b0).
+torchvision>=0.17,<1.0
+
+# --- Image handling & preprocessing ----------------------------------------
+Pillow>=10.0,<12.0
+numpy>=1.26,<3.0
+scipy>=1.11,<2.0
+
+# --- Training metrics & reports --------------------------------------------
+scikit-learn>=1.4,<2.0
+matplotlib>=3.8,<4.0
+pandas>=2.1,<3.0
+
+# --- Tests -----------------------------------------------------------------
+pytest>=8.0,<9.0
