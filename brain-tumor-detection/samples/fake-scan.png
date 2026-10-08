@@ -1,0 +1,2 @@
+This file has a .png extension but contains no PNG data.
+It must be rejected by content sniffing with HTTP 422 invalid_image.

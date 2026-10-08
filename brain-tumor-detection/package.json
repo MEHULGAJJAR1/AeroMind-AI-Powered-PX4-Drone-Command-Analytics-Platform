@@ -1,0 +1,13 @@
+{
+  "name": "brainscan-ai-frontend-check",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional dev tooling for BrainScan AI: drives the real UI against a running server (scripts/frontend-check.mjs). The web app itself needs no build step.",
+  "type": "module",
+  "scripts": {
+    "check:frontend": "node scripts/frontend-check.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.2"
+  }
+}

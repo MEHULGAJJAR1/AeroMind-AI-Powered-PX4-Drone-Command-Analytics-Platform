@@ -30,3 +30,7 @@ data/*
 Thumbs.db
 .idea/
 .vscode/
+
+# Node tooling for scripts/frontend-check.mjs
+node_modules/
+package-lock.json

@@ -125,10 +125,11 @@ brain-tumor-detection/
 │   ├── train.py                  # CLI training loop + artifacts
 │   ├── evaluate.py               # checkpoint evaluation report
 │   └── synthetic.py              # MRI phantom generator (pipeline testing)
+├── samples/                      # sample MRI phantoms + two invalid-file fixtures
 ├── static/                       # css/app.css, js/app.js, img/favicon.svg
 ├── templates/                    # index.html, 404.html
 ├── tests/                        # 127 pytest tests (API, model, preprocessing, …)
-├── scripts/                      # setup.sh, run-dev.sh, train-demo-model.sh, smoke-test.sh
+├── scripts/                      # setup, run, train, smoke-test, frontend-check.mjs
 ├── data/                         # runtime: models/, uploads/, history.db (git-ignored)
 ├── run.py                        # dev entry point
 ├── wsgi.py                       # gunicorn entry point
@@ -207,6 +208,16 @@ Open **http://localhost:5000**. The API health check is at
 ```bash
 ./scripts/smoke-test.sh              # health → predict → invalid file → history → stats
 ```
+
+Sample scans are in `samples/` — drag `tumor_sample_01.png` onto the dropzone, or:
+
+```bash
+curl -X POST http://localhost:5000/api/predict -F "image=@samples/tumor_sample_01.png"
+curl -i    -X POST http://localhost:5000/api/predict -F "image=@samples/fake-scan.png"   # → 422
+```
+
+> The samples are procedurally generated phantoms (see `samples/README.md`), not real
+> patient scans.
 
 ### Production
 
@@ -505,6 +516,17 @@ corrupt rows), rate limiter, and the full HTTP API including degraded mode.
 
 The suite writes a tiny random checkpoint into a temp directory, so it needs no trained
 model and no dataset.
+
+### Frontend smoke test (optional, needs Node)
+
+Drives the real `index.html` + `app.js` in jsdom against a running server — the full
+select → predict → result → history → delete flow, plus client-side rejection:
+
+```bash
+npm install                       # jsdom only; the app itself needs no build step
+python run.py &                   # server on :5000
+npm run check:frontend            # 30 checks, exit 0 on success
+```
 
 ---
 
