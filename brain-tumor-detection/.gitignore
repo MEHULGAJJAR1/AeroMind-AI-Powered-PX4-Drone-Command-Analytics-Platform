@@ -1,0 +1,17 @@
+# Datasets and generated data (never commit patient or third-party images)
+data/
+instance/
+
+# Trained weights and metrics: regenerate with `python -m ml.train`
+models/*.pt
+models/*.tmp
+models/*_metrics.json
+!models/.gitkeep
+
+# Python / tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env

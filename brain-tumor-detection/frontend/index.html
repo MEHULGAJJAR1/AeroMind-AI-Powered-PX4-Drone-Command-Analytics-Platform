@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Upload a brain MRI scan to screen for brain tumors with a convolutional neural network. Research and educational use only." />
+  <title>Brain Tumor Detection · MRI Screening</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <script type="module" src="/static/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <div class="brand">
+        <span class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5a3 3 0 0 0-3 3v.2A3.2 3.2 0 0 0 3.5 9.9a3.2 3.2 0 0 0 1.2 2.5A3.3 3.3 0 0 0 6 18.4 3 3 0 0 0 9 21V3.5Z"/><path d="M15 3.5a3 3 0 0 1 3 3v.2a3.2 3.2 0 0 1 2.5 3.2 3.2 3.2 0 0 1-1.2 2.5 3.3 3.3 0 0 1-.8 5.2 3 3 0 0 1-3 2.9V3.5Z"/></svg>
+        </span>
+        <div>
+          <p class="brand__name">Brain Tumor Detection</p>
+          <p class="brand__tag">MRI screening assistant</p>
+        </div>
+      </div>
+      <div id="model-status" class="status-pill" role="status" aria-live="polite">
+        <span class="status-pill__dot" aria-hidden="true"></span>
+        <span class="status-pill__text">Checking model…</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="intro" aria-labelledby="intro-title">
+      <h2 id="intro-title">Analyze a brain MRI scan</h2>
+      <p>Upload a brain MRI slice (JPEG, PNG or BMP). A convolutional neural network estimates whether a tumor is present and, if so, its most likely type.</p>
+    </section>
+
+    <div class="grid">
+      <!-- 1 · Upload -->
+      <section class="card" aria-labelledby="upload-title">
+        <header class="card__header">
+          <span class="step">1</span>
+          <h3 id="upload-title">Upload MRI scan</h3>
+        </header>
+
+        <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-describedby="dropzone-hint">
+          <svg class="dropzone__icon" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <p class="dropzone__title">Drag &amp; drop an MRI image here</p>
+          <p class="dropzone__subtitle">or <span class="link">browse your files</span></p>
+          <p id="dropzone-hint" class="dropzone__hint">JPEG, PNG or BMP · up to <span id="max-size">10</span> MB</p>
+          <input id="file-input" class="visually-hidden" type="file" accept=".jpg,.jpeg,.png,.bmp,image/jpeg,image/png,image/bmp" tabindex="-1" />
+        </div>
+
+        <div id="preview" class="preview" hidden>
+          <figure class="preview__figure">
+            <img id="preview-image" alt="Preview of the selected MRI scan" />
+          </figure>
+          <dl class="file-meta">
+            <div><dt>File</dt><dd id="meta-name">—</dd></div>
+            <div><dt>Size</dt><dd id="meta-size">—</dd></div>
+            <div><dt>Dimensions</dt><dd id="meta-dims">—</dd></div>
+          </dl>
+          <button id="remove-btn" class="btn btn--ghost btn--small" type="button">Remove image</button>
+        </div>
+
+        <p id="upload-error" class="alert alert--error" role="alert" hidden></p>
+
+        <div class="actions">
+          <button id="predict-btn" class="btn btn--primary btn--block" type="button" disabled>
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="btn__label">Analyze scan</span>
+          </button>
+          <p class="fineprint">The image is validated on the server, analyzed, and then discarded. Only a small thumbnail and the result are kept in your history.</p>
+        </div>
+      </section>
+
+      <!-- 2 · Result -->
+      <section class="card" aria-labelledby="result-title">
+        <header class="card__header">
+          <span class="step">2</span>
+          <h3 id="result-title">Prediction result</h3>
+        </header>
+        <div id="result" class="result" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <!-- 3 · History -->
+    <section class="card history" aria-labelledby="history-title">
+      <header class="card__header card__header--split">
+        <div class="card__header-title">
+          <span class="step">3</span>
+          <h3 id="history-title">Prediction history</h3>
+        </div>
+        <div class="card__header-actions">
+          <button id="history-refresh" class="btn btn--ghost btn--small" type="button">Refresh</button>
+          <button id="history-clear" class="btn btn--danger-ghost btn--small" type="button">Clear all</button>
+        </div>
+      </header>
+      <div id="history-list" class="history__list" aria-live="polite"></div>
+      <div class="history__footer">
+        <p id="history-count" class="muted"></p>
+        <button id="history-more" class="btn btn--ghost btn--small" type="button" hidden>Load more</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p><strong>Research and education only.</strong> This tool is not a medical device and must not be used for diagnosis or treatment decisions. Always involve a qualified radiologist or clinician.</p>
+    </div>
+  </footer>
+</body>
+</html>

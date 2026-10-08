@@ -1,0 +1,9 @@
+# Runtime + training dependencies (Python 3.10+).
+# CPU-only machines: install torch/torchvision from the CPU index first to avoid large CUDA wheels, e.g.
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2,<3
+torchvision>=0.17,<1
+Flask>=3.0,<4
+Pillow>=10.1
+numpy>=1.26
+gunicorn>=22.0
